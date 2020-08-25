@@ -11,7 +11,7 @@ variable "aws_access_key" {
 }
 
 variable "aws_secret_key" {
-  default = "yn1M3JuCgiBup8z8xG0oVq4i5rK/mT55ET1PGVWN"
+  default = "it should be a secret"
 }
 
 variable "bucket_name" {
