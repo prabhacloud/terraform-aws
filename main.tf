@@ -1,23 +1,63 @@
-provider "aws" {
-  region     = var.aws_region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-}
-#create S3 bucket 
-resource "aws_s3_bucket" "athena_source" {
-  bucket = var.bucket_name
-  acl    = "private"  
-  force_destroy = true
+resource "aws_glue_catalog_table" "aws_glue_catalog_table" {
+  name          = "test"
+  database_name = "prabhakar"
 
-  tags = {
-    Name  = "prabhacloud"
+  table_type = "EXTERNAL_TABLE"
+
+  parameters = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
   }
-}
 
-resource "aws_s3_bucket_object" "object" {
+  storage_descriptor {
+    location      = "s3://prabhakar-test-010/parquet/test/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
-  bucket = var.bucket_name
-  key    = "2010_orders.csv"
-  source = "${path.module}/2010_orders.csv"
-  depends_on = [aws_s3_bucket.athena_source]
+    ser_de_info {
+      name                  = "my-stream"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+      parameters = {
+        "serialization.format" = 1
+      }
+    }
+
+    columns {
+      name = "order_id"
+      type = "string"
+    }
+
+    columns {
+      name = "item_id"
+      type = "string"
+    }
+
+    columns {
+      name = "customer_id"
+      type = "string"
+    }
+
+    columns {
+      name = "product"
+      type = "string"
+    }
+
+    columns {
+      name = "amount"
+      type = "int"
+    }
+    columns {
+      name = "currency"
+      type = "string"
+    }
+    columns {
+      name = "time_stamp"
+      type = "string"
+    }
+    columns {
+      name = "dt"
+      type = "string"
+    }
+  }
 }
